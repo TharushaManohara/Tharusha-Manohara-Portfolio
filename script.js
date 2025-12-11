@@ -193,7 +193,17 @@ document.addEventListener('keydown', (e) => {
 });
 
 // System Commands
+let chatbotActive = false;
+
 const sysCommands = {
+    "npx@google/chatbot": () => {
+        chatbotActive = true;
+        return "Chatbot module loaded successfully. You can now ask me questions about Tharusha!";
+    },
+    exit: () => {
+        toggleTerminal();
+        return "Session ended.";
+    },
     ls: () => "Directory listing of <span class='highlight-cmd'>~/portfolio</span>:<br>" +
               "drwxr-xr-x  user  staff   <span style='color:#6366f1'>#about</span><br>" +
               "drwxr-xr-x  user  staff   <span style='color:#6366f1'>#certifications</span><br>" +
@@ -236,7 +246,7 @@ const sysCommands = {
                 <span class="prompt">user@tharusha:~$</span> Welcome to Tharusha's System Control.
             </div>
             <div class="terminal-line">
-                <span class="prompt">user@tharusha:~$</span> Type 'help' for commands, or just ask me anything!
+                <span class="prompt">user@tharusha:~$</span> Type 'help' for commands.
             </div>
         `;
         return ""; // Don't print "Command not found" after clear
@@ -249,7 +259,8 @@ const sysCommands = {
                 "<span class='highlight-cmd'>theme dark</span>     - Switch to Dark Mode<br>" +
                 "<span class='highlight-cmd'>status</span>         - Check system status<br>" +
                 "<span class='highlight-cmd'>clear</span>          - Clear terminal output<br>" +
-                "<span class='highlight-cmd'>chat</span>           - Ask general questions about me"
+                "<span class='highlight-cmd'>npx@google/chatbot</span> - Initialize Chatbot<br>" +
+                "<span class='highlight-cmd'>exit</span>           - Close Terminal"
 };
 
 
@@ -283,31 +294,35 @@ if(termInput) {
                 // System Command with args
                 output = sysCommands[cmd](args);
             } else {
-                // --- Chatbot Logic ---
-                const botKnowledge = [
-                    { keys: ['who', 'name', 'developer', 'author'], answer: "I am **Tharusha Manohara**, a Computer Engineering undergraduate at KDU." },
-                    { keys: ['university', 'college', 'campus', 'study', 'education', 'kdu', 'degree'], answer: "I study Computer Engineering at **General Sir John Kotelawala Defence University (KDU)**." },
-                    { keys: ['skill', 'skills', 'stack', 'tech', 'technologies', 'language', 'languages', 'program', 'coding'], answer: "My main stack includes **React, JavaScript, C++, Arduino, and Python**. Type 'go skills' to see the full graph." },
-                    { keys: ['contact', 'email', 'reach', 'message', 'call'], answer: "You can email me at **tharushamanohara2003@gmail.com** or use the contact form. Type 'go contact' to jump there." },
-                    { keys: ['project', 'projects', 'work', 'works', 'build', 'portfolio'], answer: "I have built IoT systems, Web Apps, and this portfolio! Type 'go projects' to view them." },
-                    { keys: ['age', 'old'], answer: "I am 22 years old." },
-                    { keys: ['hobby', 'hobbies', 'fun', 'like', 'interest', 'interests'], answer: "I love coding, exploring IoT hardware, and designing futuristic UIs." },
-                    { keys: ['hi', 'hello', 'hey', 'greetings'], answer: "Hello! I am Tharusha's virtual assistant. Ask me anything about his work!" }
-                ];
+                if (!chatbotActive) {
+                     output = `Command not recognized. Type <span class='highlight-cmd'>help</span> for commands.`;
+                } else {
+                    // --- Chatbot Logic ---
+                    const botKnowledge = [
+                        { keys: ['who', 'name', 'developer', 'author'], answer: "I am **Tharusha Manohara**, a Computer Engineering undergraduate at KDU." },
+                        { keys: ['university', 'college', 'campus', 'study', 'education', 'kdu', 'degree'], answer: "I study Computer Engineering at **General Sir John Kotelawala Defence University (KDU)**." },
+                        { keys: ['skill', 'skills', 'stack', 'tech', 'technologies', 'language', 'languages', 'program', 'coding'], answer: "My main stack includes **React, JavaScript, C++, Arduino, and Python**. Type 'go skills' to see the full graph." },
+                        { keys: ['contact', 'email', 'reach', 'message', 'call'], answer: "You can email me at **tharushamanohara2003@gmail.com** or use the contact form. Type 'go contact' to jump there." },
+                        { keys: ['project', 'projects', 'work', 'works', 'build', 'portfolio'], answer: "I have built IoT systems, Web Apps, and this portfolio! Type 'go projects' to view them." },
+                        { keys: ['age', 'old'], answer: "I am 22 years old." },
+                        { keys: ['hobby', 'hobbies', 'fun', 'like', 'interest', 'interests'], answer: "I love coding, exploring IoT hardware, and designing futuristic UIs." },
+                        { keys: ['hi', 'hello', 'hey', 'greetings'], answer: "Hello! I am Tharusha's virtual assistant. Ask me anything about his work!" }
+                    ];
 
-                let found = false;
-                const lowerInput = fullInput.toLowerCase();
+                    let found = false;
+                    const lowerInput = fullInput.toLowerCase();
 
-                for (let entry of botKnowledge) {
-                    if (entry.keys.some(k => new RegExp("\\b" + k + "\\b").test(lowerInput))) {
-                        output = entry.answer;
-                        found = true;
-                        break;
+                    for (let entry of botKnowledge) {
+                        if (entry.keys.some(k => new RegExp("\\b" + k + "\\b").test(lowerInput))) {
+                            output = entry.answer;
+                            found = true;
+                            break;
+                        }
                     }
-                }
 
-                if (!found) {
-                    output = `Command not recognized. I'm a simple bot! Try asking about my <span class='highlight-cmd'>skills</span>, <span class='highlight-cmd'>education</span>, or <span class='highlight-cmd'>contact</span> info. Type <span class='highlight-cmd'>help</span> for commands.`;
+                    if (!found) {
+                        output = `Command not recognized. I'm a simple bot! Try asking about my <span class='highlight-cmd'>skills</span>, <span class='highlight-cmd'>education</span>, or <span class='highlight-cmd'>contact</span> info. Type <span class='highlight-cmd'>help</span> for commands.`;
+                    }
                 }
             }
 
